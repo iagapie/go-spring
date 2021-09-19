@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring CMS - {{ index .page "title" }}</title>
+    <meta name="description" content='{{ index .page "meta_description" }}'>
+    <meta name="title" content='{{ index .page "title" }}'>
+    <meta name="author" content="Spring CMS">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Spring CMS">
+    <link href='{{ assets "css/vendor.css" }}' rel="stylesheet">
+    <link href='{{ assets "css/theme.css" }}' rel="stylesheet">
+</head>
+<body>
+<header id="layout-header">
+    {{ partial "site/header" .}}
+</header>
+<section id="layout-content">
+    {{ page }}
+</section>
+<footer id="layout-footer">
+    {{ partial "site/footer" .}}
+</footer>
+</body>
+</html>

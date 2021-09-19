@@ -1,0 +1,13 @@
+[cfg]
+title = "Foo page"
+url = "/foo/:id|^[0-9]+$"
+layout= "default.html"
+description = "test"
+meta_title="Foo"
+meta_description = "test"
+is_hidden = 0
+[/cfg]
+<div class="container">
+    <h1>{{ index .page "title" }}</h1>
+    <p>Page ID: {{ index .param "id" }}</p>
+</div>

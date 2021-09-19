@@ -1,0 +1,5 @@
+cms:
+  active_theme: "demo"
+  backend_uri: "/backend"
+  plugins_path: "./plugins"
+  themes_path: "./themes"

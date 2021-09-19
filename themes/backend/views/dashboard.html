@@ -1,0 +1,16 @@
+{{template "default.html" .}}
+
+{{define "body"}}
+<h1>Hello {{ index .Local "name" }}</h1>
+
+<p>{{ index .Local "boo" "boo" }}</p>
+
+<p>{{ url "dashboard" }}</p>
+
+<p>{{ with $x := index .Global "url" }}
+    {{ call $x "dashboard" }} &lt;-- this will call the $x with parameter "foobar"
+    {{ end }}
+</p>
+
+{{index .Local "foo"}}
+{{end}}

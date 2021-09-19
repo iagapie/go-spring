@@ -1,0 +1,21 @@
+<nav id="layout-nav" class="navbar navbar-inverse navbar-fixed-top navbar-autohide" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ page_url "home.html" }}">Spring Demo</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-main-collapse">
+            <ul class="nav navbar-nav">
+                <li class="separator hidden-xs"></li>
+                <li class="{{ if is_page "home.html" }}active{{end}}"><a href="{{ page_url "home.html" }}">Home</a></li>
+                <li class="{{ if is_page "foo.html" }}active{{end}}"><a href="{{ page_url "foo.html" 1234 }}">Foo page</a></li>
+                <li><a href="{{ route_url "welcome" }}">Welcome Demo Plugin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

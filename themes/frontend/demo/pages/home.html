@@ -1,0 +1,17 @@
+[cfg]
+title = "Demonstration"
+url = "/"
+layout= "default.html"
+description = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad animi commodi cumque dignissimos ea earum ipsa iusto laudantium libero nesciunt odit, possimus quae qui quibusdam sit soluta sunt vitae voluptatibus?"
+meta_title="Home"
+meta_description = "Lorem ipsum dolor sit amet"
+is_hidden = 0
+
+[demoTodo]
+size = 10
+[/cfg]
+<div class="container">
+    <h1>{{ index .page "title" }}</h1>
+    <time>{{ time now "02 Jan 2006 15:04" }}</time>
+    <p>{{ index .page "description" }}</p>
+</div>
