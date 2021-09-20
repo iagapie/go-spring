@@ -39,18 +39,20 @@ func main() {
 	}
 
 	navManager := manager.NewNavigationManager(pluginManager)
+	compManager := manager.NewComponentManager(pluginManager)
 
 	m := &manager.Manager{
 		ConfigManager:     configManger,
 		LogManager:        logManager,
 		PluginManager:     pluginManager,
 		NavigationManager: navManager,
+		ComponentManager:  compManager,
 	}
 
 	pluginManager.RegisterAll(m)
 
 	s := spring.New(configManger.Config(), logManager.Echo())
-	ctr := controller.New(s, t)
+	ctr := controller.New(s, t, compManager, log)
 
 	backendRenderer := template.New(
 		"backend",

@@ -5,4 +5,5 @@ type Manager struct {
 	LogManager        LogManager
 	PluginManager     PluginManager
 	NavigationManager NavigationManager
+	ComponentManager  ComponentManager
 }

@@ -43,6 +43,10 @@ type (
 	PluginRegisterQuickActions interface {
 		RegisterQuickActions() map[string]QuickActionItem
 	}
+
+	PluginRegisterComponents interface {
+		RegisterComponents() map[string]ComponentFactory
+	}
 )
 
 type (
@@ -56,18 +60,22 @@ type (
 	}
 
 	PluginInfo interface {
+		File() string
+		Dir() string
 		Plugin() Plugin
 		Register(*Manager)
 		Boot(*spring.Spring)
 		Routes(*spring.Frontend, *spring.Backend)
 		RegisterNavigation() map[string]MainMenuItem
 		RegisterQuickActions() map[string]QuickActionItem
+		RegisterComponents() map[string]ComponentFactory
 	}
 
 	plug struct {
-		log *logrus.Entry
-		gop *plugin.Plugin
-		p   Plugin
+		log  *logrus.Entry
+		gop  *plugin.Plugin
+		p    Plugin
+		file string
 	}
 
 	plugManager struct {
@@ -117,9 +125,10 @@ func (pm *plugManager) GetByFile(file string) (PluginInfo, error) {
 	}
 
 	info := &plug{
-		log: pm.log,
-		gop: gop,
-		p:   *p.(*Plugin),
+		log:  pm.log,
+		gop:  gop,
+		p:    *p.(*Plugin),
+		file: file,
 	}
 
 	details := info.Plugin().Details()
@@ -160,6 +169,14 @@ func (pm *plugManager) RoutesAll(f *spring.Frontend, b *spring.Backend) {
 	for _, info := range pm.plugins {
 		info.Routes(f, b)
 	}
+}
+
+func (p *plug) File() string {
+	return p.file
+}
+
+func (p *plug) Dir() string {
+	return filepath.Dir(p.file)
 }
 
 func (p *plug) Plugin() Plugin {
@@ -203,6 +220,13 @@ func (p *plug) RegisterNavigation() map[string]MainMenuItem {
 func (p *plug) RegisterQuickActions() map[string]QuickActionItem {
 	if n, ok := p.p.(PluginRegisterQuickActions); ok {
 		return n.RegisterQuickActions()
+	}
+	return nil
+}
+
+func (p *plug) RegisterComponents() map[string]ComponentFactory {
+	if c, ok := p.p.(PluginRegisterComponents); ok {
+		return c.RegisterComponents()
 	}
 	return nil
 }

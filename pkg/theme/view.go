@@ -18,6 +18,7 @@ type (
 		ID() string
 		Name() string
 		CfgProps() CfgProps
+		CfgComps() CfgComps
 		Cfg() *ini.File
 		SetCfg(cfg *ini.File)
 		Content() string
@@ -34,7 +35,12 @@ type (
 
 	FuncMap  map[string]interface{}
 	CfgProps map[string]string
-	CfgComps map[string]CfgProps
+	CfgComp  struct {
+		Name  string
+		Alias string
+		Props CfgProps
+	}
+	CfgComps map[string]CfgComp
 
 	ViewOption interface {
 		apply(v *view)
@@ -141,7 +147,16 @@ func (v *view) CfgComps() CfgComps {
 	comps := make(CfgComps)
 	for _, s := range v.cfg.Sections() {
 		if name := s.Name(); name != ini.DefaultSection {
-			comps[name] = keysToCfgProps(s.Keys())
+			alias := name
+			if index := strings.IndexRune(name, ' '); index != -1 {
+				alias = name[index+1:]
+				name = name[:index]
+			}
+			comps[alias] = CfgComp{
+				Name:  name,
+				Alias: alias,
+				Props: keysToCfgProps(s.Keys()),
+			}
 		}
 	}
 	return comps
@@ -169,6 +184,7 @@ func (v *view) File() string {
 }
 
 func (v *view) SetFile(file string) {
+	v.id = file
 	v.file = file
 }
 

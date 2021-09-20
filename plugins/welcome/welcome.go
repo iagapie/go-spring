@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/iagapie/go-spring/pkg/manager"
 	"github.com/iagapie/go-spring/pkg/spring"
+	"github.com/iagapie/go-spring/plugins/welcome/components"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
@@ -35,6 +36,14 @@ func (p *plug) Boot(s *spring.Spring) {
 			return next(c)
 		}
 	})
+}
+
+func (p *plug) RegisterComponents() map[string]manager.ComponentFactory {
+	return map[string]manager.ComponentFactory{
+		"todo": func(props manager.ComponentProps) (manager.Component, error) {
+			return components.NewTodo(props), nil
+		},
+	}
 }
 
 func (p *plug) Routes(f *spring.Frontend, b *spring.Backend) {
