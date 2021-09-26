@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spring CMS - {{ index .page "title" }}</title>
-    <meta name="description" content='{{ index .page "meta_description" }}'>
-    <meta name="title" content='{{ index .page "title" }}'>
+    <title>Spring CMS - {{ .Page.Prop "title" }}</title>
+    <meta name="description" content='{{ .Page.Prop "meta_description" }}'>
+    <meta name="title" content='{{ .Page.Prop "title" }}'>
     <meta name="author" content="Spring CMS">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="Spring CMS">
@@ -13,13 +13,36 @@
 </head>
 <body>
 <header id="layout-header">
-    {{ partial "site/header" .}}
+    {{ partial "site/header" }}
 </header>
 <section id="layout-content">
     {{ page }}
 </section>
 <footer id="layout-footer">
-    {{ partial "site/footer" .}}
+    {{ partial "site/footer" }}
 </footer>
+<script>
+    fetch("/", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X_SPRING_REQUEST_HANDLER': 'todo::OnFetchData',
+            'X_SPRING_REQUEST_PARTIALS': 'new_todo/foo'
+        },
+        body: JSON.stringify({"foo": "boo"})
+    }).then(d => d.json()).then(v => console.log(v))
+
+    const formData = new FormData();
+    formData.append("_handler", "todo::OnFetchForm")
+    formData.append("title", "test title")
+
+    fetch("/", {
+        method: "POST",
+        body: formData,
+        mode: 'cors'
+    }).then(d => d.json()).then(v => console.log(v))
+</script>
 </body>
 </html>

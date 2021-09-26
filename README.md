@@ -1,7 +1,7 @@
 # Spring CMS
 
 ```shell
-go build -buildmode=plugin -o plugins/welcome/welcome.so plugins/welcome/welcome.go
+go build -buildmode=plugin -o plugins/spring/demo/spring_demo.so plugins/spring/demo/spring_demo.go
 ```
 
 ### Run

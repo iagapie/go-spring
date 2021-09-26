@@ -13,7 +13,7 @@
             <ul class="nav navbar-nav">
                 <li class="separator hidden-xs"></li>
                 <li class="{{ if is_page "home.html" }}active{{end}}"><a href="{{ page_url "home.html" }}">Home</a></li>
-                <li class="{{ if is_page "foo.html" }}active{{end}}"><a href="{{ page_url "foo.html" 1234 }}">Foo page</a></li>
+                <li class="{{ if is_page "foo.html" }}active{{end}}"><a href="{{ page_url "foo.html" (param "id" 1234) }}">Foo page</a></li>
                 <li><a href="{{ route_url "welcome" }}">Welcome Demo Plugin</a></li>
             </ul>
         </div>

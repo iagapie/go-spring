@@ -2,93 +2,73 @@ package main
 
 import (
 	"fmt"
-	"github.com/iagapie/go-spring/pkg/controller"
-	"github.com/iagapie/go-spring/pkg/manager"
-	"github.com/iagapie/go-spring/pkg/spring"
-	"github.com/iagapie/go-spring/pkg/template"
-	"github.com/iagapie/go-spring/pkg/theme"
+	"github.com/iagapie/go-spring/modules/cms/component"
+	"github.com/iagapie/go-spring/modules/cms/controller"
+	"github.com/iagapie/go-spring/modules/cms/theme"
+	"github.com/iagapie/go-spring/modules/sys/config"
+	"github.com/iagapie/go-spring/modules/sys/datasource"
+	"github.com/iagapie/go-spring/modules/sys/helper"
+	"github.com/iagapie/go-spring/modules/sys/logger"
+	"github.com/iagapie/go-spring/modules/sys/plugin"
+	"github.com/iagapie/go-spring/modules/sys/spring"
+	"github.com/iagapie/go-spring/modules/sys/view"
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	template2 "html/template"
-	"net/http"
-	"strings"
 )
 
 func main() {
-	configManger, err := manager.NewConfigManager("./configs/app", "./configs/cms")
-	if err != nil {
+	var cfg config.Cfg
+	if err := helper.ReadConfig(&cfg, "./configs/app", "./configs/cms"); err != nil {
 		panic(err)
 	}
-	cfg := configManger.Config()
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
+		panic(err)
+	}
 
 	lvl := logrus.InfoLevel
 	if cfg.App.Debug {
 		lvl = logrus.DebugLevel
 	}
-	logManager := manager.NewLogManager(manager.WithLogLevel(lvl))
-	log := logManager.Logrus()
+	log := logger.New(logger.WithLevel(lvl))
 
-	theme.SetThemesPath(cfg.CMS.ThemesPath + "/frontend")
+	plugManager, err := plugin.New(cfg.CMS.PluginsPath, log)
+	if err != nil {
+		panic(err)
+	}
+
+	s := spring.New(cfg, log)
+	view.Add("route_url", s.Reverse)
+
+	theme.SetThemesPath(fmt.Sprintf("%s/frontend", cfg.CMS.ThemesPath))
+	theme.SetDatasource(datasource.NewFile(log))
 	theme.SetActiveTheme(cfg.CMS.ActiveTheme)
 
-	t := theme.ActiveTheme()
-
-	pluginManager, err := manager.NewPluginManager(cfg.CMS.PluginsPath, logManager.Logrus())
-	if err != nil {
-		log.Fatalln(err)
+	for _, t := range theme.Themes() {
+		s.Frontend.Static(t.Assets())
 	}
 
-	navManager := manager.NewNavigationManager(pluginManager)
-	compManager := manager.NewComponentManager(pluginManager)
+	plugManager.RegisterAll(s)
 
-	m := &manager.Manager{
-		ConfigManager:     configManger,
-		LogManager:        logManager,
-		PluginManager:     pluginManager,
-		NavigationManager: navManager,
-		ComponentManager:  compManager,
+	compManager := component.New(plugManager)
+
+	s.HTTPErrorHandler = func(err error, c echo.Context) {
+		// TODO: add backend check
+		ctr := controller.New(s, compManager)
+		ctr.Error(err, c)
 	}
 
-	pluginManager.RegisterAll(m)
-
-	s := spring.New(configManger.Config(), logManager.Echo())
-	ctr := controller.New(s, t, compManager, log)
-
-	backendRenderer := template.New(
-		"backend",
-		fmt.Sprintf("%s/backend/views", cfg.CMS.ThemesPath),
-		template.WithGlobal("backend_uri", cfg.CMS.BackendURI),
-		template.WithFunc("url", s.Reverse),
-		template.WithFunc("backend_url", func(uri string) string {
-			return fmt.Sprintf("%s/%s", cfg.CMS.BackendURI, strings.TrimLeft(uri, "/"))
-		}),
-	)
-
-	s.Backend.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			c.Echo().Renderer = backendRenderer
-			return next(c)
-		}
+	s.Frontend.Any("/", func(c echo.Context) error {
+		ctr := controller.New(s, compManager)
+		return ctr.Run(c)
 	})
 
-	pluginManager.BootAll(s)
+	s.Frontend.Any("/*", func(c echo.Context) error {
+		ctr := controller.New(s, compManager)
+		return ctr.Run(c)
+	})
 
-	s.Backend.Static("", fmt.Sprintf("%s/backend/assets", cfg.CMS.ThemesPath))
-	s.Backend.GET("/dashboard", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "dashboard.html", map[string]interface{}{
-			"name": "Dolly!",
-			"foo":  template2.HTML("<h2>Fooooo</h2>"),
-			"boo": map[string]interface{}{
-				"boo": "BOOOOOO",
-			},
-		})
-	}).Name = "dashboard"
-
-	s.Frontend.Static(t.Assets())
-	s.Frontend.Any("/", ctr.Run)
-	s.Frontend.Any("/*", ctr.Run)
-
-	pluginManager.RoutesAll(s.Frontend, s.Backend)
+	plugManager.RoutesAll(s.Frontend, s.Backend)
 
 	if err = s.Run(); err != nil {
 		s.Logger.Fatalf("Error occurred while running HTTP runner: %v", err)

@@ -1,7 +1,7 @@
 [cfg]
 title = "Demonstration"
 url = "/"
-layout= "default.html"
+layout= "default"
 description = "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad animi commodi cumque dignissimos ea earum ipsa iusto laudantium libero nesciunt odit, possimus quae qui quibusdam sit soluta sunt vitae voluptatibus?"
 meta_title="Home"
 meta_description = "Lorem ipsum dolor sit amet"
@@ -14,9 +14,9 @@ max = 20
 max = 50
 [/cfg]
 <div class="container">
-    <h1>{{ index .page "title" }}</h1>
-    <time>{{ time now "02 Jan 2006 15:04" }}</time>
-    <p>{{ index .page "description" }}</p>
+    <h1>{{ .Page.Prop "title" }}</h1>
+    <time>{{ format now "02 Jan 2006 15:04" }}</time>
+    <p>{{ .Page.Prop "description" }}</p>
 
     {{ component "todo" }}
     {{ component "new_todo" }}
