@@ -10,6 +10,7 @@
     <meta name="generator" content="Spring CMS">
     <link href='{{ assets "css/vendor.css" }}' rel="stylesheet">
     <link href='{{ assets "css/theme.css" }}' rel="stylesheet">
+    {{ styles }}
 </head>
 <body>
 <header id="layout-header">
@@ -21,28 +22,6 @@
 <footer id="layout-footer">
     {{ partial "site/footer" }}
 </footer>
-<script>
-    fetch("/", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X_SPRING_REQUEST_HANDLER': 'todo::OnFetchData',
-            'X_SPRING_REQUEST_PARTIALS': 'new_todo/foo'
-        },
-        body: JSON.stringify({"foo": "boo"})
-    }).then(d => d.json()).then(v => console.log(v))
-
-    const formData = new FormData();
-    formData.append("_handler", "todo::OnFetchForm")
-    formData.append("title", "test title")
-
-    fetch("/", {
-        method: "POST",
-        body: formData,
-        mode: 'cors'
-    }).then(d => d.json()).then(v => console.log(v))
-</script>
+{{ scripts }}
 </body>
 </html>

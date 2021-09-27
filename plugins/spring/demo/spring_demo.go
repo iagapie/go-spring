@@ -39,7 +39,7 @@ func (p *plug) Routes(f *spring.Frontend, b *spring.Backend) {
 func (p *plug) RegisterComponents() component.FactoryMap {
 	return component.FactoryMap{
 		"todo": func(v view.View, props component.Props) (component.Component, error) {
-			return components.NewTodo(props), nil
+			return components.NewTodo(v, props), nil
 		},
 	}
 }

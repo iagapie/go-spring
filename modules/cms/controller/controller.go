@@ -226,8 +226,7 @@ func (ctr *controller) initComponents() error {
 }
 
 func (ctr *controller) addComponent(name, alias string, props view.Props, addToLayout bool) (component.Component, error) {
-	var v view.View
-	v = ctr.cur.Page
+	v := ctr.cur.Page
 
 	if addToLayout {
 		v = ctr.cur.Layout
