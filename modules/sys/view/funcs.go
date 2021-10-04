@@ -1,29 +1,28 @@
 package view
 
-import "time"
+import (
+	"github.com/Masterminds/sprig"
+	"html/template"
+	"time"
+)
 
 type Param struct {
 	Name  string
 	Value interface{}
 }
 
-var funcs FuncMap
+var funcs template.FuncMap
 
 func init() {
-	funcs = FuncMap{
-		"now": time.Now,
-		"now_utc": func() time.Time {
-			return time.Now().UTC()
-		},
-		"format": func(t time.Time, layout string) string {
-			return t.Format(layout)
-		},
-		"param": func(name string, value interface{}) Param {
-			return Param{
-				Name:  name,
-				Value: value,
-			}
-		},
+	funcs = sprig.FuncMap()
+	funcs["nowUtc"] = func() time.Time {
+		return time.Now().UTC()
+	}
+	funcs["param"] = func(name string, value interface{}) Param {
+		return Param{
+			Name:  name,
+			Value: value,
+		}
 	}
 }
 
@@ -31,8 +30,8 @@ func Add(name string, fn interface{}) {
 	funcs[name] = fn
 }
 
-func globalFuncs() FuncMap {
-	funMap := make(FuncMap)
+func globalFuncs() template.FuncMap {
+	funMap := make(template.FuncMap)
 	for k, v := range funcs {
 		funMap[k] = v
 	}

@@ -8,15 +8,15 @@ import (
 	"strings"
 )
 
-func funcs(ctr *controller) view.FuncMap {
-	return view.FuncMap{
+func funcs(ctr *controller) template.FuncMap {
+	return template.FuncMap{
 		"page":      ctr.renderPage,
 		"partial":   ctr.renderPartial,
 		"component": ctr.renderComponent,
-		"is_page": func(name string) bool {
+		"isPage": func(name string) bool {
 			return strings.EqualFold(ctr.cur.Page.Name(), name)
 		},
-		"page_url": func(name string, params ...view.Param) string {
+		"pageURL": func(name string, params ...view.Param) string {
 			routerParams := make(sysRouter.Params)
 			for _, p := range params {
 				routerParams[p.Name] = fmt.Sprintf("%v", p.Value)

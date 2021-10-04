@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/iagapie/go-spring/modules/sys/datasource"
 	"github.com/iagapie/go-spring/modules/sys/helper"
-	"github.com/iagapie/go-spring/modules/sys/view"
+	"html/template"
 	"path/filepath"
 )
 
@@ -23,7 +23,7 @@ type (
 		Path() string
 		Cfg() (Cfg, error)
 		Assets() (uri string, path string)
-		Funcs(funcs view.FuncMap)
+		Funcs(funcs template.FuncMap)
 		ResetViews()
 		Pages() ViewMap
 		Page(name string) View
@@ -125,7 +125,7 @@ func (t *theme) Assets() (uri string, path string) {
 	return
 }
 
-func (t *theme) Funcs(funcs view.FuncMap) {
+func (t *theme) Funcs(funcs template.FuncMap) {
 	t.datasource.Funcs(funcs)
 }
 

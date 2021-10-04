@@ -14,7 +14,6 @@ import (
 )
 
 type (
-	FuncMap map[string]interface{}
 	Props   map[string]string
 	Comps   map[string]*Comp
 	Comp    struct {
@@ -31,7 +30,7 @@ type (
 		Prop(name string) string
 		CfgComps() Comps
 		Content() string
-		Funcs(funcMap FuncMap)
+		Funcs(funcMap template.FuncMap)
 		Load() error
 		Execute(w io.Writer, vars interface{}) error
 		Render(vars interface{}) (string, error)
@@ -53,7 +52,7 @@ type (
 		delimRight string
 		start      string
 		end        string
-		funcs      FuncMap
+		funcs      template.FuncMap
 		t          *template.Template
 	}
 )
@@ -65,7 +64,7 @@ const (
 	cEnd        = "[/cfg]"
 )
 
-func WithFuncs(funcMap FuncMap) Option {
+func WithFuncs(funcMap template.FuncMap) Option {
 	return option(func(v *view) {
 		v.Funcs(funcMap)
 	})
@@ -141,7 +140,7 @@ func (v *view) Content() string {
 	return v.content
 }
 
-func (v *view) Funcs(funcMap FuncMap) {
+func (v *view) Funcs(funcMap template.FuncMap) {
 	for name, fn := range funcMap {
 		v.funcs[name] = fn
 	}
@@ -227,7 +226,7 @@ func (v *view) parseCfg(cfg string) error {
 }
 
 func (v *view) parse() (err error) {
-	v.t, err = template.New(v.File()).Funcs(template.FuncMap(v.funcs)).Parse(v.Content())
+	v.t, err = template.New(v.File()).Funcs(v.funcs).Parse(v.Content())
 	return
 }
 

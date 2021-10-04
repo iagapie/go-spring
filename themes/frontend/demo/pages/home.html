@@ -15,7 +15,7 @@ max = 50
 [/cfg]
 <div class="container">
     <h1>{{ .Page.Prop "title" }}</h1>
-    <time>{{ format now "02 Jan 2006 15:04" }}</time>
+    <time>{{ now | date "02 Jan 2006 15:04" }}</time>
     <p>{{ .Page.Prop "description" }}</p>
 
     {{ component "todo" }}

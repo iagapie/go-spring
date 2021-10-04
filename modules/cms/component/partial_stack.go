@@ -1,11 +1,13 @@
 package component
 
-type psItem map[string][]map[string]interface{}
+type (
+	psItem map[string][]map[string]interface{}
 
-type PartialStack struct {
-	activePartial psItem
-	partialStack  []psItem
-}
+	PartialStack struct {
+		activePartial psItem
+		partialStack  []psItem
+	}
+)
 
 func NewPartialStack() *PartialStack {
 	return &PartialStack{

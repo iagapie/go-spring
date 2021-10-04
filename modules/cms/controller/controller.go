@@ -25,12 +25,9 @@ type (
 	}
 
 	controller struct {
-		s            *spring.Spring
 		t            theme.Theme
+		s            *spring.Spring
 		compManager  *component.Manager
-		compParamRe  *regexp.Regexp
-		handlerRe    *regexp.Regexp
-		partialRe    *regexp.Regexp
 		router       *router.Router
 		partialStack *component.PartialStack
 		cur          *current
@@ -47,6 +44,12 @@ const (
 	ErrHTML = "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><title>Spring CMS - Error</title></head><body><div class=\"container\"><h1>Error</h1><p>We're sorry, but something went wrong and the page cannot be displayed.</p></div></body></html>"
 )
 
+var (
+	compParamRe   = regexp.MustCompile("^{{([^}]+)}}$")
+	handlerNameRe = regexp.MustCompile("^(?:\\w+\\:{2})?On[A-Z][\\w+]*$")
+	partialNameRe = regexp.MustCompile("^(?:\\w+\\:{2})?[\\w\\_\\-\\.\\/]+$")
+)
+
 func New(s *spring.Spring, compManager *component.Manager) Controller {
 	t := theme.ActiveTheme()
 	r := router.NewRouter(t)
@@ -58,9 +61,6 @@ func New(s *spring.Spring, compManager *component.Manager) Controller {
 		router:       r,
 		partialStack: stack,
 		compManager:  compManager,
-		compParamRe:  regexp.MustCompile("^{{([^}]+)}}$"),
-		handlerRe:    regexp.MustCompile("^(?:\\w+\\:{2})?On[A-Z][\\w+]*$"),
-		partialRe:    regexp.MustCompile("^(?:\\w+\\:{2})?[\\w\\_\\-\\.\\/]+$"),
 	}
 
 	t.Funcs(funcs(ctr))
@@ -254,7 +254,7 @@ func (ctr *controller) addComponent(name, alias string, props view.Props, addToL
 
 func (ctr *controller) setComponentPropertiesFromParams(comp component.Component, params map[string]interface{}) {
 	for k, value := range comp.Props() {
-		if matches := ctr.compParamRe.FindStringSubmatch(value); len(matches) == 2 {
+		if matches := compParamRe.FindStringSubmatch(value); len(matches) == 2 {
 			paramName := strings.TrimSpace(matches[1])
 			newValue := ""
 
@@ -458,13 +458,13 @@ func (ctr *controller) execAjaxHandlers(c echo.Context) (string, error) {
 		return "", nil
 	}
 
-	if !ctr.handlerRe.MatchString(handler) {
+	if !handlerNameRe.MatchString(handler) {
 		return "", fmt.Errorf("ajax handler invalid name: %s", handler)
 	}
 
 	partialList := strings.Split(strings.TrimSpace(c.Request().Header.Get(HeaderRequestPartials)), "&")
 	for _, p := range partialList {
-		if !ctr.partialRe.MatchString(p) {
+		if !partialNameRe.MatchString(p) {
 			return "", fmt.Errorf("partial invalid name: %s", p)
 		}
 	}

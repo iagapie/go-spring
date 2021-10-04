@@ -38,7 +38,7 @@ func main() {
 	}
 
 	s := spring.New(cfg, log)
-	view.Add("route_url", s.Reverse)
+	view.Add("routeURL", s.Reverse)
 
 	theme.SetThemesPath(fmt.Sprintf("%s/frontend", cfg.CMS.ThemesPath))
 	theme.SetDatasource(datasource.NewFile(log))

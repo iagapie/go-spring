@@ -7,14 +7,14 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ page_url "home.html" }}">Spring Demo</a>
+            <a class="navbar-brand" href="{{ pageURL "home.html" }}">Spring Demo</a>
         </div>
         <div class="collapse navbar-collapse navbar-main-collapse">
             <ul class="nav navbar-nav">
                 <li class="separator hidden-xs"></li>
-                <li class="{{ if is_page "home.html" }}active{{end}}"><a href="{{ page_url "home.html" }}">Home</a></li>
-                <li class="{{ if is_page "foo.html" }}active{{end}}"><a href="{{ page_url "foo.html" (param "id" 1234) }}">Foo page</a></li>
-                <li><a href="{{ route_url "welcome" }}">Welcome Demo Plugin</a></li>
+                <li class="{{ if isPage "home.html" }}active{{end}}"><a href="{{ pageURL "home.html" }}">Home</a></li>
+                <li class="{{ if isPage "foo.html" }}active{{end}}"><a href="{{ pageURL "foo.html" (param "id" 1234) }}">Foo page</a></li>
+                <li><a href="{{ routeURL "welcome" }}">Welcome Demo Plugin</a></li>
             </ul>
         </div>
     </div>

@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"github.com/iagapie/go-spring/modules/sys/view"
 	"github.com/labstack/echo/v4"
+	"html/template"
 	"path/filepath"
 	"sync"
 )
 
 type (
 	Datasource interface {
-		Funcs(funcMap view.FuncMap)
+		Funcs(funcMap template.FuncMap)
 		SelectOne(dir, name, ext string) view.View
 		Select(dir, ext string) ViewMap
 	}
@@ -20,18 +21,18 @@ type (
 	fileDatasource struct {
 		mu    sync.RWMutex
 		log   echo.Logger
-		funcs view.FuncMap
+		funcs template.FuncMap
 	}
 )
 
 func NewFile(log echo.Logger) Datasource {
 	return &fileDatasource{
 		log:   log,
-		funcs: make(view.FuncMap),
+		funcs: make(template.FuncMap),
 	}
 }
 
-func (ds *fileDatasource) Funcs(funcMap view.FuncMap) {
+func (ds *fileDatasource) Funcs(funcMap template.FuncMap) {
 	ds.mu.Lock()
 	defer ds.mu.Unlock()
 	for name, fn := range funcMap {
