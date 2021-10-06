@@ -1,11 +1,19 @@
 import React from 'react'
 import { render } from 'react-dom'
-
-import { App } from '@/App'
+import { Provider } from 'react-redux'
+import 'regenerator-runtime/runtime'
 
 import '@/styles/index.scss'
 
+import { sagaMiddleware, store } from '@/store'
+import rootSaga from '@/store/rootSaga'
+import { App } from '@/App'
+
+sagaMiddleware.run(rootSaga)
+
 render(
-  <App/>,
-  document.getElementById('root')
+  <Provider store={store}>
+    <App/>
+  </Provider>,
+  document.getElementById('root'),
 )
