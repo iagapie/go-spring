@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DemoPlugin" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="go-spring" />
+    <working_directory value="$PROJECT_DIR$/plugins/spring/demo" />
+    <go_parameters value="-buildmode=plugin -o spring_demo.so" />
+    <kind value="FILE" />
+    <package value="github.com/iagapie/go-spring" />
+    <directory value="$PROJECT_DIR$/plugins/spring/demo" />
+    <filePath value="$PROJECT_DIR$/plugins/spring/demo/spring_demo.go" />
+    <output_directory value="$PROJECT_DIR$/plugins/spring/demo" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

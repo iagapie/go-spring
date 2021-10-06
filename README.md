@@ -1,13 +1,18 @@
 # Spring CMS
 
-### Build plugin
-```shell
-go build -buildmode=plugin -o plugins/spring/demo/spring_demo.so plugins/spring/demo/spring_demo.go
-```
-
 ### Run CMS
 ```shell
-./go-spring
+make run
 ```
 
 http://localhost:8000
+
+### Build plugin
+```shell
+make build_plugin_demo
+```
+
+### Build app
+```shell
+make build
+```
