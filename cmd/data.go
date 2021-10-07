@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-type globalData struct {
+type __data struct {
 	cfg         config.Cfg
 	log         *logger.Logger
 	encoder     password.Encoder
@@ -20,7 +20,7 @@ type globalData struct {
 	userService user.Service
 }
 
-func initGlobalData(ctx *cli.Context) (*globalData, error) {
+func initData(ctx *cli.Context) (*__data, error) {
 	var cfg config.Cfg
 	if err := helper.ReadConfig(&cfg, ctx.StringSlice("config")...); err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func initGlobalData(ctx *cli.Context) (*globalData, error) {
 	log.Infoln("user service initializing")
 	userService := user.NewService(userStorage, encoder)
 
-	return &globalData{
+	return &__data{
 		cfg:         cfg,
 		log:         log,
 		encoder:     encoder,

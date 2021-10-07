@@ -34,11 +34,11 @@ var UserCreate = &cli.Command{
 }
 
 func runUserCreate(ctx *cli.Context) error {
-	global, err := initGlobalData(ctx)
+	data, err := initData(ctx)
 	if err != nil {
 		return err
 	}
-	defer global.db.Close()
+	defer data.db.Close()
 
 	dto := user.CreateUserDTO{
 		Name:           ctx.String("name"),
@@ -51,11 +51,11 @@ func runUserCreate(ctx *cli.Context) error {
 		return err
 	}
 
-	id, err := global.userService.Create(context.Background(), dto)
+	id, err := data.userService.Create(context.Background(), dto)
 	if err != nil {
 		return err
 	}
 
-	global.log.Infof("user %s <%s> was created with UUID %s", dto.Name, dto.Email, id)
+	data.log.Infof("user %s <%s> was created with UUID %s", dto.Name, dto.Email, id)
 	return nil
 }

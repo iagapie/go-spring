@@ -27,16 +27,16 @@ and it takes care of all the other things for you`,
 }
 
 func runWeb(ctx *cli.Context) error {
-	global, err := initGlobalData(ctx)
+	data, err := initData(ctx)
 	if err != nil {
 		return err
 	}
-	defer global.db.Close()
+	defer data.db.Close()
 
-	global.log.Infoln("redis initializing")
+	data.log.Infoln("redis initializing")
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     global.cfg.Redis.Addr,
-		Password: global.cfg.Redis.Password,
+		Addr:     data.cfg.Redis.Addr,
+		Password: data.cfg.Redis.Password,
 		DB:       0,
 	})
 	defer func() {
@@ -45,30 +45,30 @@ func runWeb(ctx *cli.Context) error {
 		}
 	}()
 
-	global.log.Infoln("redis cache initializing")
+	data.log.Infoln("redis cache initializing")
 	redisCache := cache.New(&cache.Options{
 		Redis: rdb,
 	})
 
-	global.log.Infoln("token manager initializing")
-	tokenManager := token.New(token.WithJWTKeys(global.cfg.JWT.SigningKeys))
+	data.log.Infoln("token manager initializing")
+	tokenManager := token.New(token.WithJWTKeys(data.cfg.JWT.SigningKeys))
 
-	global.log.Infoln("auth service initializing")
-	authService := auth.NewService(global.cfg.JWT.TTL, global.userService, redisCache, tokenManager, global.log.Entry)
+	data.log.Infoln("auth service initializing")
+	authService := auth.NewService(data.cfg.JWT.TTL, data.userService, redisCache, tokenManager, data.log.Entry)
 
-	global.log.Infoln("plugin manager initializing")
-	plugManager, err := plugin.New(global.cfg.CMS.PluginsPath, global.log)
+	data.log.Infoln("plugin manager initializing")
+	plugManager, err := plugin.New(data.cfg.CMS.PluginsPath, data.log)
 	if err != nil {
 		return err
 	}
 
-	global.log.Infoln("spring (echo) framework initializing")
-	s := spring.New(global.cfg, global.log)
+	data.log.Infoln("spring (echo) framework initializing")
+	s := spring.New(data.cfg, data.log)
 	view.Add("routeURL", s.Reverse)
 
-	theme.SetThemesPath(fmt.Sprintf("%s/frontend", global.cfg.CMS.ThemesPath))
-	theme.SetDatasource(datasource.NewFile(global.log))
-	theme.SetActiveTheme(global.cfg.CMS.ActiveTheme)
+	theme.SetThemesPath(fmt.Sprintf("%s/frontend", data.cfg.CMS.ThemesPath))
+	theme.SetDatasource(datasource.NewFile(data.log))
+	theme.SetActiveTheme(data.cfg.CMS.ActiveTheme)
 
 	for _, t := range theme.Themes() {
 		s.Frontend.Static(t.Assets())
@@ -76,7 +76,7 @@ func runWeb(ctx *cli.Context) error {
 
 	plugManager.RegisterAll(s)
 
-	global.log.Infoln("component manager initializing")
+	data.log.Infoln("component manager initializing")
 	compManager := component.New(plugManager)
 
 	authHandler := &auth.Handler{Service: authService}
