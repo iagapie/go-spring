@@ -10,7 +10,9 @@ import (
 var cfgFiles = []string{
 	"./configs/app",
 	"./configs/cms",
+	"./configs/db",
 	"./configs/jwt",
+	"./configs/redis",
 }
 
 func main() {
@@ -19,6 +21,7 @@ func main() {
 	app.Version = "1.0.0"
 	app.Commands = []*cli.Command{
 		cmd.Web,
+		cmd.UserCreate,
 	}
 
 	defaultFlags := []cli.Flag{

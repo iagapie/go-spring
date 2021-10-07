@@ -27,8 +27,8 @@ func (fn jwtOption) apply(jt *jwtToken) {
 
 func WithJWTKeys(jwtKeys config.JWTKeys) JWTOption {
 	return jwtOption(func(jt *jwtToken) {
-		WithPrivateKeyFile(jwtKeys.Private)
-		WithPublicKeyFile(jwtKeys.Public)
+		WithPrivateKeyFile(jwtKeys.Private).apply(jt)
+		WithPublicKeyFile(jwtKeys.Public).apply(jt)
 	})
 }
 

@@ -21,3 +21,8 @@ make build
 ```shell
 make cert
 ```
+
+### Create backend user
+```shell
+./go-spring user:create -n Name -e name@gmail.com -p "Admin123"
+```

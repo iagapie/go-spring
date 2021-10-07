@@ -2,19 +2,19 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/iagapie/go-spring/modules/backend/handler"
+	"github.com/go-redis/cache/v8"
+	"github.com/go-redis/redis/v8"
+	"github.com/iagapie/go-spring/modules/backend/auth"
 	"github.com/iagapie/go-spring/modules/cms/component"
 	"github.com/iagapie/go-spring/modules/cms/controller"
 	"github.com/iagapie/go-spring/modules/cms/theme"
-	"github.com/iagapie/go-spring/modules/sys/config"
 	"github.com/iagapie/go-spring/modules/sys/datasource"
-	"github.com/iagapie/go-spring/modules/sys/helper"
-	"github.com/iagapie/go-spring/modules/sys/logger"
 	"github.com/iagapie/go-spring/modules/sys/plugin"
 	"github.com/iagapie/go-spring/modules/sys/spring"
 	"github.com/iagapie/go-spring/modules/sys/token"
 	"github.com/iagapie/go-spring/modules/sys/view"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -27,26 +27,48 @@ and it takes care of all the other things for you`,
 }
 
 func runWeb(ctx *cli.Context) error {
-	var cfg config.Cfg
-	if err := helper.ReadConfigWithEnv(&cfg, ctx.StringSlice("config")...); err != nil {
+	global, err := initGlobalData(ctx)
+	if err != nil {
 		return err
 	}
+	defer global.db.Close()
 
-	log := logger.New(logger.WithDebug(cfg.App.Debug))
+	global.log.Infoln("redis initializing")
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     global.cfg.Redis.Addr,
+		Password: global.cfg.Redis.Password,
+		DB:       0,
+	})
+	defer func() {
+		if err = rdb.Close(); err != nil {
+			log.Error(err)
+		}
+	}()
 
-	tokenManager := token.New(token.WithJWTKeys(cfg.JWT.SigningKeys))
+	global.log.Infoln("redis cache initializing")
+	redisCache := cache.New(&cache.Options{
+		Redis: rdb,
+	})
 
-	plugManager, err := plugin.New(cfg.CMS.PluginsPath, log)
+	global.log.Infoln("token manager initializing")
+	tokenManager := token.New(token.WithJWTKeys(global.cfg.JWT.SigningKeys))
+
+	global.log.Infoln("auth service initializing")
+	authService := auth.NewService(global.cfg.JWT.TTL, global.userService, redisCache, tokenManager, global.log.Entry)
+
+	global.log.Infoln("plugin manager initializing")
+	plugManager, err := plugin.New(global.cfg.CMS.PluginsPath, global.log)
 	if err != nil {
 		return err
 	}
 
-	s := spring.New(cfg, log)
+	global.log.Infoln("spring (echo) framework initializing")
+	s := spring.New(global.cfg, global.log)
 	view.Add("routeURL", s.Reverse)
 
-	theme.SetThemesPath(fmt.Sprintf("%s/frontend", cfg.CMS.ThemesPath))
-	theme.SetDatasource(datasource.NewFile(log))
-	theme.SetActiveTheme(cfg.CMS.ActiveTheme)
+	theme.SetThemesPath(fmt.Sprintf("%s/frontend", global.cfg.CMS.ThemesPath))
+	theme.SetDatasource(datasource.NewFile(global.log))
+	theme.SetActiveTheme(global.cfg.CMS.ActiveTheme)
 
 	for _, t := range theme.Themes() {
 		s.Frontend.Static(t.Assets())
@@ -54,13 +76,10 @@ func runWeb(ctx *cli.Context) error {
 
 	plugManager.RegisterAll(s)
 
+	global.log.Infoln("component manager initializing")
 	compManager := component.New(plugManager)
 
-	authHandler := &handler.AuthHandler{
-		TokenManager: tokenManager,
-		Access:       cfg.JWT.TTL.Access,
-		Refresh:      cfg.JWT.TTL.Refresh,
-	}
+	authHandler := &auth.Handler{Service: authService}
 	authHandler.Register(s.Backend)
 
 	s.HTTPErrorHandler = func(err error, c echo.Context) {

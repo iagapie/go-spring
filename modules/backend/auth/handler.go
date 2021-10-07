@@ -1,11 +1,11 @@
-package handler
+package auth
 
 import (
+	"errors"
+	"github.com/iagapie/go-spring/modules/backend/user"
 	"github.com/iagapie/go-spring/modules/sys/spring"
-	"github.com/iagapie/go-spring/modules/sys/token"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"time"
 )
 
 const (
@@ -13,35 +13,17 @@ const (
 	refreshURL = "/refresh"
 )
 
-type (
-	SignInDTO struct {
-		Email    string `json:"email,omitempty" validate:"required,email,min=3,max=255"`
-		Password string `json:"password,omitempty" validate:"required,min=8,max=64"`
-	}
+type Handler struct {
+	Service Service
+}
 
-	RefreshTokenDTO struct {
-		Token string `json:"token,omitempty" validate:"required,uuid4"`
-	}
-
-	Tokens struct {
-		AccessToken  string `json:"access_token,omitempty"`
-		RefreshToken string `json:"refresh_token,omitempty"`
-	}
-
-	AuthHandler struct {
-		Access       time.Duration
-		Refresh      time.Duration
-		TokenManager token.Token
-	}
-)
-
-func (h *AuthHandler) Register(b *spring.Backend) {
+func (h *Handler) Register(b *spring.Backend) {
 	m := []string{echo.POST, echo.OPTIONS}
 	b.Match(m, signInURL, h.signIn)[0].Name = "backend-sign-in"
 	b.Match(m, refreshURL, h.refresh)[0].Name = "backend-refresh"
 }
 
-func (h *AuthHandler) signIn(c echo.Context) error {
+func (h *Handler) signIn(c echo.Context) error {
 	c.Logger().Info("BACKEND SIGN IN HANDLER")
 
 	var dto SignInDTO
@@ -56,10 +38,18 @@ func (h *AuthHandler) signIn(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &dto)
+	r, err := h.Service.Auth(c.Request().Context(), dto)
+	if err != nil {
+		if errors.Is(err, user.ErrRecordNotFound) {
+			return echo.ErrNotFound.SetInternal(err)
+		}
+		return err
+	}
+
+	return c.JSON(http.StatusOK, &r)
 }
 
-func (h *AuthHandler) refresh(c echo.Context) error {
+func (h *Handler) refresh(c echo.Context) error {
 	c.Logger().Info("BACKEND REFRESH HANDLER")
 
 	var dto RefreshTokenDTO
@@ -74,5 +64,10 @@ func (h *AuthHandler) refresh(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, &dto)
+	r, err := h.Service.RefreshToken(c.Request().Context(), dto)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, &r)
 }
