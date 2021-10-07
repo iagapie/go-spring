@@ -27,6 +27,14 @@ type (
 	}
 )
 
+func WithDebug(debug bool) Option {
+	lvl := logrus.InfoLevel
+	if debug {
+		lvl = logrus.DebugLevel
+	}
+	return WithLevel(lvl)
+}
+
 func WithLevel(lvl logrus.Level) Option {
 	return option(func(l *Logger) {
 		l.Logger.SetLevel(lvl)

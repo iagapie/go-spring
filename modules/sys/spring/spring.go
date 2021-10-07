@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/iagapie/go-spring/modules/sys/config"
+	middleware2 "github.com/iagapie/go-spring/modules/sys/middleware"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"log"
@@ -71,7 +72,7 @@ func New(cfg config.Cfg, l echo.Logger) *Spring {
 			return next(&spCtx{c, s})
 		}
 	})
-	s.Use(middleware.Logger(), middleware.Recover(), middleware.CORS())
+	s.Use(middleware.Logger(), middleware.Recover(), middleware.CORS(), middleware2.ValidateError())
 
 	s.Frontend = &Frontend{
 		Group: s.Group(""),

@@ -7,6 +7,13 @@ import (
 
 var exts = []string{".yml", ".yaml", ".json", ".toml", ".env"}
 
+func ReadConfigWithEnv(cfg interface{}, files ...string) error {
+	if err := ReadConfig(cfg, files...); err != nil {
+		return err
+	}
+	return cleanenv.ReadEnv(cfg)
+}
+
 func ReadConfig(cfg interface{}, files ...string) error {
 	for _, file := range files {
 		if hasExt(file) {

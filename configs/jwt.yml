@@ -1,0 +1,10 @@
+jwt:
+  context_key: "user"
+  token_lookup: "header:Authorization"
+  auth_scheme: "Bearer"
+  signing_keys:
+    public: "cert/id_rsa.pub"
+    private: "cert/id_rsa"
+  ttl:
+    access: "30m"
+    refresh: "8760h"

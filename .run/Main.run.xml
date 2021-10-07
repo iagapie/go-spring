@@ -2,6 +2,7 @@
   <configuration default="false" name="Main" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="go-spring" />
     <working_directory value="$PROJECT_DIR$" />
+    <parameters value="web" />
     <kind value="PACKAGE" />
     <package value="github.com/iagapie/go-spring" />
     <directory value="$PROJECT_DIR$" />

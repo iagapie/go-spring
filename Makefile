@@ -13,5 +13,11 @@ build: ## Build app
 	go build
 
 .PHONY: run
-run: build_plugin_demo ## Run app
-	go run main.go || true
+run: cert build_plugin_demo ## Run app
+	go run main.go web || true
+
+.PHONY: cert
+cert: ## Generate asymmetric RSA for JWT
+	mkdir -p cert
+	openssl genrsa -out cert/id_rsa 4096
+	openssl rsa -in cert/id_rsa -pubout -out cert/id_rsa.pub

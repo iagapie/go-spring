@@ -2,8 +2,7 @@
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
-
-.idea/
-
 **/*.so
 go-spring
+.idea/
+cert/
