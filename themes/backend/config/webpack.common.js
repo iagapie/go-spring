@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const paths = require('./paths')
 const getClientEnvironment = require('./env')
@@ -45,14 +44,6 @@ module.exports = {
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'production') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),
-
-    // Generates an HTML file from a template
-    // Generates deprecation warning: https://github.com/jantimon/html-webpack-plugin/issues/1501
-    new HtmlWebpackPlugin({
-      title: env.raw.APP_NAME,
-      template: `${paths.src}/index.html`, // template file
-      filename: 'index.html', // output file
-    }),
   ],
 
   // Determine how modules within the project are treated

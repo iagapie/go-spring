@@ -9,7 +9,7 @@
     "prepare": "cd ../.. && husky install themes/backend/.husky",
     "start": "cross-env DEBUG=true BABEL_ENV=development NODE_ENV=development webpack serve --config config/webpack.dev.js",
     "build": "cross-env DEBUG=false BABEL_ENV=production NODE_ENV=production webpack --config config/webpack.prod.js",
-    "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css,scss,md}\"",
+    "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "eslint": "eslint src/**/*.{ts,tsx}"
   },
   "husky": {

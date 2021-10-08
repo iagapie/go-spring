@@ -7,6 +7,7 @@ Cookie.defaults = {
 class CookiesService {
   public static get<T>(key: string, defaultValue: T): T {
     const item = Cookie.get(key)
+
     return item ? JSON.parse(item) : defaultValue
   }
 

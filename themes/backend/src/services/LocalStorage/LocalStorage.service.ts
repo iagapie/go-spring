@@ -7,6 +7,7 @@ class LocalStorageService {
 
   public get<T>(key: string, defaultValue: T): T {
     const item = this.storage.getItem(key)
+
     return item ? JSON.parse(item) : defaultValue
   }
 

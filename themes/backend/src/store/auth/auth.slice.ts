@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 import { AuthState } from '../types'
+
 import localStorageService from '@/services/LocalStorage/LocalStorage.service'
 import cookiesService from '@/services/Cookies/Cookies.service'
 

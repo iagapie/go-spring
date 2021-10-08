@@ -1,8 +1,12 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
 const { merge } = require('webpack-merge')
 
+const getClientEnvironment = require('./env')
 const paths = require('./paths')
 const common = require('./webpack.common')
+
+const env = getClientEnvironment()
 
 module.exports = merge(common, {
   // Set the mode to development or production
@@ -22,6 +26,16 @@ module.exports = merge(common, {
       directory: paths.build,
     },
   },
+
+  plugins: [
+    // Generates an HTML file from a template
+    // Generates deprecation warning: https://github.com/jantimon/html-webpack-plugin/issues/1501
+    new HtmlWebpackPlugin({
+      title: env.raw.APP_NAME,
+      template: `${paths.src}/index.html`, // template file
+      filename: 'index.html', // output file
+    }),
+  ],
 
   module: {
     rules: [

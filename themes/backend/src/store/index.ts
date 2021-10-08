@@ -2,6 +2,7 @@ import createSagaMiddleware from 'redux-saga'
 import { configureStore } from '@reduxjs/toolkit'
 
 import rootReducer from './rootReducer'
+
 import { isProduction } from '@/utils/constants'
 
 export const sagaMiddleware = createSagaMiddleware()
