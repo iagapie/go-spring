@@ -1,5 +1,5 @@
 const webpack = require('webpack')
-const {merge} = require('webpack-merge')
+const { merge } = require('webpack-merge')
 
 const paths = require('./paths')
 const common = require('./webpack.common')
@@ -19,8 +19,8 @@ module.exports = merge(common, {
     hot: true,
     port: 3000,
     static: {
-      directory: paths.build
-    }
+      directory: paths.build,
+    },
   },
 
   module: {
@@ -32,7 +32,7 @@ module.exports = merge(common, {
           'style-loader',
           {
             loader: 'css-loader',
-            options: {sourceMap: true, importLoaders: 1, modules: false, url: false},
+            options: { sourceMap: true, importLoaders: 1, modules: false, url: false },
           },
           {
             loader: 'postcss-loader',
@@ -43,9 +43,9 @@ module.exports = merge(common, {
               sourceMap: true,
             },
           },
-          {loader: 'sass-loader', options: {sourceMap: true}},
+          { loader: 'sass-loader', options: { sourceMap: true } },
         ],
       },
     ],
-  }
+  },
 })

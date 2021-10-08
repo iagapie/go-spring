@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
-import 'regenerator-runtime/runtime'
+import 'regenerator-runtime/runtime';
 
 import '@/styles/index.scss'
 
@@ -13,7 +13,7 @@ sagaMiddleware.run(rootSaga)
 
 render(
   <Provider store={store}>
-    <App/>
+    <App />
   </Provider>,
-  document.getElementById('root'),
+  document.getElementById('root')
 )

@@ -13,13 +13,13 @@ const { NODE_ENV } = process.env
 
 // https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
 const dotenvFiles = [
-    `${paths.dotenv}.${NODE_ENV}.local`,
-    // Don't include `.env.local` for `test` environment
-    // since normally you expect tests to produce the same
-    // results for everyone
-    NODE_ENV !== 'test' && `${paths.dotenv}.local`,
-    `${paths.dotenv}.${NODE_ENV}`,
-    paths.dotenv,
+  `${paths.dotenv}.${NODE_ENV}.local`,
+  // Don't include `.env.local` for `test` environment
+  // since normally you expect tests to produce the same
+  // results for everyone
+  NODE_ENV !== 'test' && `${paths.dotenv}.local`,
+  `${paths.dotenv}.${NODE_ENV}`,
+  paths.dotenv,
 ].filter(Boolean)
 
 // Load environment variables from .env* files. Suppress warnings using silent
@@ -28,13 +28,13 @@ const dotenvFiles = [
 // https://github.com/motdotla/dotenv
 // https://github.com/motdotla/dotenv-expand
 dotenvFiles.forEach((dotenvFile) => {
-    if (fs.existsSync(dotenvFile)) {
-        dotenvExpand(
-            dotenv.config({
-                path: dotenvFile,
-            }),
-        )
-    }
+  if (fs.existsSync(dotenvFile)) {
+    dotenvExpand(
+      dotenv.config({
+        path: dotenvFile,
+      })
+    )
+  }
 })
 
 // Grab NODE_ENV and REACT_APP_* environment variables and prepare them to be
@@ -44,22 +44,19 @@ const APP = /^APP_/i
 const nodeEnv = process.env.NODE_ENV || 'development'
 
 const getClientEnvironment = () => {
-    const raw = Object.keys(process.env)
-        .filter((key) => APP.test(key))
-        .reduce((obj, key) => ({ ...obj, [key]: process.env[key] }), {
-            BABEL_ENV: process.env.BABEL_ENV || 'development',
-            NODE_ENV: nodeEnv,
-            DEBUG: process.env.DEBUG || nodeEnv === 'development',
-        })
+  const raw = Object.keys(process.env)
+    .filter((key) => APP.test(key))
+    .reduce((obj, key) => ({ ...obj, [key]: process.env[key] }), {
+      BABEL_ENV: process.env.BABEL_ENV || 'development',
+      NODE_ENV: nodeEnv,
+      DEBUG: process.env.DEBUG || nodeEnv === 'development',
+    })
 
-    const stringified = {
-        'process.env': Object.keys(raw).reduce(
-            (obj, key) => ({ ...obj, [key]: JSON.stringify(raw[key]) }),
-            {},
-        ),
-    }
+  const stringified = {
+    'process.env': Object.keys(raw).reduce((obj, key) => ({ ...obj, [key]: JSON.stringify(raw[key]) }), {}),
+  }
 
-    return { raw, stringified }
+  return { raw, stringified }
 }
 
 module.exports = getClientEnvironment

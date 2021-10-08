@@ -8,7 +8,7 @@ const keyUser = 'auth.user'
 const keyTokens = 'tokens'
 
 const currentUser = localStorageService.get(keyUser, {})
-const {accessToken, refreshToken} = cookiesService.get(keyTokens, {accessToken: '', refreshToken: ''})
+const { accessToken, refreshToken } = cookiesService.get(keyTokens, { accessToken: '', refreshToken: '' })
 const isAuthenticated = Object.keys(currentUser).length !== 0 && !!accessToken && !!refreshToken
 
 const initialState: AuthState = {

@@ -1,5 +1,5 @@
 const webpack = require('webpack')
-const {CleanWebpackPlugin} = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -64,13 +64,13 @@ module.exports = {
        * The TypeScript loader will compile all .ts/.tsx files to .js. Babel is
        * not necessary here since TypeScript is taking care of all transpiling.
        */
-      {test: /\.ts(x?)$/, loader: 'ts-loader', exclude: /node_modules/},
+      { test: /\.ts(x?)$/, loader: 'ts-loader', exclude: /node_modules/ },
 
       // Images: Copy image files to build folder
-      {test: /\.(?:ico|gif|png|jpg|jpeg)$/i, type: 'asset/resource'},
+      { test: /\.(?:ico|gif|png|jpg|jpeg)$/i, type: 'asset/resource' },
 
       // Fonts and SVGs: Inline files
-      {test: /\.(woff(2)?|eot|ttf|otf|svg|)$/, type: 'asset/inline'},
+      { test: /\.(woff(2)?|eot|ttf|otf|svg|)$/, type: 'asset/inline' },
     ],
   },
 
