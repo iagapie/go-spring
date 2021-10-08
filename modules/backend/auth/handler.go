@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"errors"
-	"github.com/iagapie/go-spring/modules/backend/user"
 	"github.com/iagapie/go-spring/modules/sys/spring"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -18,9 +16,9 @@ type Handler struct {
 }
 
 func (h *Handler) Register(b *spring.Backend) {
-	m := []string{echo.POST, echo.OPTIONS}
-	b.Match(m, signInURL, h.signIn)[0].Name = "backend-sign-in"
-	b.Match(m, refreshURL, h.refresh)[0].Name = "backend-refresh"
+	mp := []string{echo.POST, echo.OPTIONS}
+	b.Match(mp, signInURL, h.signIn)[0].Name = "backend-sign-in"
+	b.Match(mp, refreshURL, h.refresh)[0].Name = "backend-refresh"
 }
 
 func (h *Handler) signIn(c echo.Context) error {
@@ -40,9 +38,6 @@ func (h *Handler) signIn(c echo.Context) error {
 
 	r, err := h.Service.Auth(c.Request().Context(), dto)
 	if err != nil {
-		if errors.Is(err, user.ErrRecordNotFound) {
-			return echo.ErrNotFound.SetInternal(err)
-		}
 		return err
 	}
 

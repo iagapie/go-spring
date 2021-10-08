@@ -1,14 +1,18 @@
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"github.com/go-redis/cache/v8"
 	"github.com/go-redis/redis/v8"
 	"github.com/iagapie/go-spring/modules/backend/auth"
+	"github.com/iagapie/go-spring/modules/backend/user"
 	"github.com/iagapie/go-spring/modules/cms/component"
 	"github.com/iagapie/go-spring/modules/cms/controller"
 	"github.com/iagapie/go-spring/modules/cms/theme"
 	"github.com/iagapie/go-spring/modules/sys/datasource"
+	"github.com/iagapie/go-spring/modules/sys/middleware"
 	"github.com/iagapie/go-spring/modules/sys/plugin"
 	"github.com/iagapie/go-spring/modules/sys/spring"
 	"github.com/iagapie/go-spring/modules/sys/token"
@@ -66,6 +70,7 @@ func runWeb(ctx *cli.Context) error {
 	s := spring.New(data.cfg, data.log)
 	view.Add("routeURL", s.Reverse)
 
+	data.log.Infoln("theme initializing")
 	theme.SetThemesPath(fmt.Sprintf("%s/frontend", data.cfg.CMS.ThemesPath))
 	theme.SetDatasource(datasource.NewFile(data.log))
 	theme.SetActiveTheme(data.cfg.CMS.ActiveTheme)
@@ -74,15 +79,38 @@ func runWeb(ctx *cli.Context) error {
 		s.Frontend.Static(t.Assets())
 	}
 
+	data.log.Infoln("plugin manager: RegisterAll")
 	plugManager.RegisterAll(s)
 
 	data.log.Infoln("component manager initializing")
 	compManager := component.New(plugManager)
 
+	data.log.Infoln("backend authentication handler initializing")
 	authHandler := &auth.Handler{Service: authService}
 	authHandler.Register(s.Backend)
 
+	userContextKey := "user"
+	userTransformFunc := func(ctx context.Context, item interface{}) (interface{}, error) {
+		return data.userService.GetByUUID(ctx, item.(string))
+	}
+	userMiddleware := middleware.Transformer(data.cfg.JWT.ContextKey, userContextKey, userTransformFunc)
+	jwtMiddleware := middleware.JWT(data.cfg.JWT, tokenManager)
+
+	data.log.Infoln("backend user handler initializing")
+	userHandler := &user.Handler{
+		Service:        data.userService,
+		JWTMiddleware:  jwtMiddleware,
+		UserMiddleware: userMiddleware,
+		UserContextKey: userContextKey,
+	}
+	userHandler.Register(s.Backend)
+
+	data.log.Infoln("cms controller initializing")
 	s.HTTPErrorHandler = func(err error, c echo.Context) {
+		if errors.Is(err, user.ErrRecordNotFound) {
+			err = echo.ErrNotFound.SetInternal(err)
+		}
+
 		ctr := controller.New(s, compManager)
 		ctr.Error(err, c)
 	}
@@ -97,6 +125,7 @@ func runWeb(ctx *cli.Context) error {
 		return ctr.Run(c)
 	})
 
+	data.log.Infoln("plugin manager: RoutesAll")
 	plugManager.RoutesAll(s.Frontend, s.Backend)
 
 	if err = s.Run(); err != nil {
