@@ -6,5 +6,5 @@ jwt:
     public: "cert/id_rsa.pub"
     private: "cert/id_rsa"
   ttl:
-    access: "30m"
+    access: "5m"
     refresh: "8760h"

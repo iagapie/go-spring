@@ -5,19 +5,19 @@ Cookie.defaults = {
 }
 
 class CookiesService {
-  public static get<T>(key: string, defaultValue: T): T {
+  public get<T>(key: string, defaultValue: T): T {
     const item = Cookie.get(key)
 
-    return item ? JSON.parse(item) : defaultValue
+    return item ? (JSON.parse(item) as T) : defaultValue
   }
 
-  public static set(key: string, value: any): void {
+  public set(key: string, value: any): void {
     Cookie.set(key, JSON.stringify(value))
   }
 
-  public static remove(key: string): void {
+  public remove(key: string): void {
     Cookie.remove(key)
   }
 }
 
-export default CookiesService
+export default new CookiesService()

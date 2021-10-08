@@ -1,13 +1,30 @@
+export interface ErrorResp {
+  message: string
+  error?: string
+}
+
+export interface SignIn {
+  email: string
+  password: string
+}
+
+export interface Tokens {
+  accessToken: string
+  refreshToken: string
+}
+
 export interface BackendUser {
-  [anyProp: string]: any
+  uuid: string
+  name: string
+  email: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface AuthState {
   isAuthenticated: boolean
-  currentUser: BackendUser
-  accessToken: string
-  refreshToken: string
-  csrf: string
+  currentUser?: BackendUser
+  tokens?: Tokens
   loading: boolean
 }
 

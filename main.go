@@ -10,6 +10,7 @@ import (
 var cfgFiles = []string{
 	"./configs/app",
 	"./configs/cms",
+	"./configs/cors",
 	"./configs/db",
 	"./configs/jwt",
 	"./configs/redis",

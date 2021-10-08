@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { AuthState } from '../types'
+import { AuthState, BackendUser, SignIn, Tokens } from '../types'
 
 import localStorageService from '@/services/LocalStorage/LocalStorage.service'
 import cookiesService from '@/services/Cookies/Cookies.service'
@@ -8,25 +8,50 @@ import cookiesService from '@/services/Cookies/Cookies.service'
 const keyUser = 'auth.user'
 const keyTokens = 'tokens'
 
-const currentUser = localStorageService.get(keyUser, {})
-const { accessToken, refreshToken } = cookiesService.get(keyTokens, { accessToken: '', refreshToken: '' })
-const isAuthenticated = Object.keys(currentUser).length !== 0 && !!accessToken && !!refreshToken
+const currentUser = localStorageService.get(keyUser, undefined)
+const tokens = cookiesService.get(keyTokens, undefined)
+const isAuthenticated = currentUser !== undefined && tokens !== undefined
 
 const initialState: AuthState = {
   isAuthenticated,
-  currentUser: isAuthenticated ? currentUser : {},
-  accessToken: isAuthenticated ? accessToken : '',
-  refreshToken: isAuthenticated ? refreshToken : '',
-  csrf: '',
+  currentUser: isAuthenticated ? currentUser : undefined,
+  tokens: isAuthenticated ? tokens : undefined,
   loading: false,
 }
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    login: (state: AuthState, { payload }: PayloadAction<SignIn>) => {
+      state.loading = true
+    },
+    loginSuccess: (state: AuthState) => {
+      state.isAuthenticated = true
+      state.loading = false
+    },
+    logout: (state: AuthState) => {
+      state.loading = true
+    },
+    setCurrentUser: (state: AuthState, { payload }: PayloadAction<BackendUser>) => {
+      state.currentUser = payload
+      localStorageService.set(keyUser, payload)
+    },
+    setTokens: (state: AuthState, { payload }: PayloadAction<Tokens>) => {
+      state.tokens = payload
+      cookiesService.set(keyTokens, payload)
+    },
+    clearAuth: (state: AuthState) => {
+      state.isAuthenticated = false
+      state.currentUser = undefined
+      state.tokens = undefined
+      state.loading = false
+      localStorageService.remove(keyUser)
+      cookiesService.remove(keyTokens)
+    },
+  },
 })
 
-export const {} = authSlice.actions
+export const { login, loginSuccess, logout, setCurrentUser, setTokens, clearAuth } = authSlice.actions
 
 export default authSlice.reducer

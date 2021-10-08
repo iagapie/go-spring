@@ -27,8 +27,8 @@ type (
 	Spring struct {
 		*echo.Echo
 		Frontend *Frontend
-		Backend *Backend
-		Cfg     config.Cfg
+		Backend  *Backend
+		Cfg      config.Cfg
 	}
 
 	Frontend struct {
@@ -67,12 +67,22 @@ func New(cfg config.Cfg, l echo.Logger) *Spring {
 	s.StdLogger = log.New(s.Logger.Output(), s.Logger.Prefix()+": ", 0)
 	s.Validator = &valid{validator.New()}
 
-	s.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			return next(&spCtx{c, s})
-		}
-	})
-	s.Use(middleware.Logger(), middleware.Recover(), middleware.CORS(), middleware2.ValidateError())
+	s.Use(
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				return next(&spCtx{c, s})
+			}
+		},
+		middleware.Logger(),
+		middleware.Recover(),
+		middleware.CORSWithConfig(middleware.CORSConfig{
+			Skipper:          middleware.DefaultCORSConfig.Skipper,
+			AllowOrigins:     middleware.DefaultCORSConfig.AllowOrigins,
+			AllowMethods:     middleware.DefaultCORSConfig.AllowMethods,
+			AllowCredentials: true,
+		}),
+		middleware2.ValidateError(),
+	)
 
 	s.Frontend = &Frontend{
 		Group: s.Group(""),
