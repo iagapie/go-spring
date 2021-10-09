@@ -10,7 +10,7 @@ export interface NotificationProps {
 }
 
 export const Notification: React.FC<NotificationProps> = ({ notification }) => {
-  const rootElementRef = useRef<HTMLDivElement>(null)
+  const rootElementRef = useRef<HTMLDivElement>(null!)
   const [parentStyle, setParentStyle] = useState({ height: '0px', overflow: 'auto', transition: 'none' })
   // switch (notification.type) {
   //   case NotifyType.success:
@@ -36,18 +36,16 @@ export const Notification: React.FC<NotificationProps> = ({ notification }) => {
   }, [dispatch, notification])
 
   useEffect(() => {
-    if (rootElementRef.current) {
-      const { scrollHeight } = rootElementRef.current
-      setParentStyle({
-        overflow: 'auto',
-        height: `${scrollHeight}px`,
-        transition: 'height 300ms linear 0ms',
-      })
-    }
-  }, [])
+    const { scrollHeight } = rootElementRef.current
+    setParentStyle({
+      overflow: 'auto',
+      height: `${scrollHeight}px`,
+      transition: 'height 300ms linear 0ms',
+    })
+  }, [rootElementRef, setParentStyle])
 
   useEffect(() => {
-    if ((notification.dismiss as number) > 0) {
+    if (notification.dismiss! > 0) {
       const timeout = setTimeout(() => onClose(), notification.dismiss)
 
       return () => {

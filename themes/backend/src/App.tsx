@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { Router, Switch, Route } from 'react-router'
+import { Router, Switch, Route, Redirect } from 'react-router'
 
 import history from '@/utils/history'
 import { routes } from '@/utils/constants'
@@ -8,7 +8,6 @@ import { NotificationContainer } from '@/components/notifications/NotificationCo
 import { Loading } from '@/components/loading/Loading'
 import { PublicRoute } from '@/components/routing/PublicRoute'
 import { PrivateRoute } from '@/components/routing/PrivateRoute'
-import NotFoundPage from '@/views/notFound/NotFoundPage'
 
 const DashboardPage = lazy(() => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/DashboardPage'))
 const LoginPage = lazy(() => import(/* webpackChunkName: "login" */ '@/views/login/LoginPage'))
@@ -26,7 +25,7 @@ export const App: React.FC = () => (
           <LoginPage />
         </PublicRoute>
         <Route path="*">
-          <NotFoundPage />
+          <Redirect to={routes.root} />
         </Route>
       </Switch>
     </Suspense>

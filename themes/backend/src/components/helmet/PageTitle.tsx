@@ -9,7 +9,10 @@ export interface PageTitleProps {
 }
 
 export const PageTitle: React.FC<PageTitleProps> = ({ title, separator }) => {
-  const _title = useMemo(() => (!title ? appName : `${title}${separator ?? ' | '}${appName}`), [title, separator])
+  const _title = useMemo(
+    () => [title, 'Backend', appName].filter((i) => !!i).join(separator ?? ' | '),
+    [title, separator]
+  )
 
   return (
     <Helmet>
