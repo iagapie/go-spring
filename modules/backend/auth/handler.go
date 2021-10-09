@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	signInURL  = "/sign-in"
-	refreshURL = "/refresh"
+	signInURL  = "/api/sign-in"
+	refreshURL = "/api/refresh"
 )
 
 type Handler struct {

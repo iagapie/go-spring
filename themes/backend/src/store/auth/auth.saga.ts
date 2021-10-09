@@ -7,6 +7,10 @@ import userService from '../../services/User/User.service'
 
 import { clearAuth, loginSuccess, setCurrentUser, setTokens } from './auth.slice'
 
+import { routes } from '@/utils/constants'
+import history from '@/utils/history'
+import { addError } from '@/store/notifications/notifications.slice'
+
 function* fetchTokens(service: any, payload: SignIn) {
   const tokens: Tokens = yield call(service, payload)
   yield put(setTokens(tokens))
@@ -23,8 +27,7 @@ function* authWorker(service: any, payload: SignIn) {
     yield call(fetchCurrentUser)
     yield put(loginSuccess())
   } catch (error) {
-    // TODO: error
-    // yield put(addError({ message: error.message }))
+    yield put(addError({ message: (error as Error).message }))
     yield put(clearAuth())
   }
 }
@@ -35,6 +38,5 @@ export function* loginWorker({ payload }: PayloadAction<SignIn>) {
 
 export function* logoutWorker() {
   yield put(clearAuth())
-  // TODO: redirect
-  // history.push(routes.auth.login)
+  history.push(routes.auth.login)
 }

@@ -1,4 +1,5 @@
-import { apiUrl, endpoints } from './constants'
+import { apiUrl, endpoints, routes } from './constants'
+import history from './history'
 
 import { getAuth } from '@/store/selectors'
 import { store } from '@/store'
@@ -19,7 +20,7 @@ export class ResponseError extends Error {
   public readonly resp: ResponseBody<ErrorResp>
 
   constructor(status: number, response: Response, resp: ResponseBody<ErrorResp>) {
-    super()
+    super((resp as ErrorResp).message ?? resp)
     this.name = 'ResponseError'
     this.status = status
     this.response = response
@@ -65,8 +66,7 @@ function refresh(): Promise<void> {
     })
     .catch((error) => {
       store.dispatch(clearAuth())
-      // TODO
-      // history.push(routes.auth.login)
+      history.push(routes.auth.login)
       throw error
     })
 }

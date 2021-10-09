@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	meURL = "/me"
+	meURL = "/api/me"
 )
 
 type Handler struct {

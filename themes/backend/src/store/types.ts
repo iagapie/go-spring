@@ -28,6 +28,26 @@ export interface AuthState {
   loading: boolean
 }
 
+export enum NotifyType {
+  Info = 'info',
+  Success = 'success',
+  Warning = 'warning',
+  Error = 'error',
+}
+
+export interface Notification {
+  id?: string
+  type?: NotifyType
+  title?: string
+  message: string
+  dismiss?: number
+}
+
+export interface NotificationsState {
+  notifications: Notification[]
+}
+
 export interface RootState {
   authState: AuthState
+  notificationsState: NotificationsState
 }

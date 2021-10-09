@@ -1,44 +1,34 @@
-import React, { useEffect } from 'react'
-import SplitPane from 'react-split-pane'
-import { Router } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { Suspense, lazy } from 'react'
+import { Router, Switch, Route } from 'react-router'
 
 import history from '@/utils/history'
-import { login } from '@/store/auth/auth.slice'
-import { SignIn } from '@/store/types'
-import { getAuth } from '@/store/selectors'
-import userService from '@/services/User/User.service'
+import { routes } from '@/utils/constants'
+import { PageTitle } from '@/components/helmet/PageTitle'
+import { NotificationContainer } from '@/components/notifications/NotificationContainer'
+import { Loading } from '@/components/loading/Loading'
+import { PublicRoute } from '@/components/routing/PublicRoute'
+import { PrivateRoute } from '@/components/routing/PrivateRoute'
+import NotFoundPage from '@/views/notFound/NotFoundPage'
 
-export const App: React.FC = () => {
-  const dispatch = useDispatch()
-  const { currentUser } = useSelector(getAuth)
+const DashboardPage = lazy(() => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/DashboardPage'))
+const LoginPage = lazy(() => import(/* webpackChunkName: "login" */ '@/views/login/LoginPage'))
 
-  // const _login = (signIn: SignIn) => dispatch(login(signIn))
-  //
-  // useEffect(() => {
-  //   _login({
-  //     email: 'iagapie@gmail.com',
-  //     password: 'Admin123',
-  //   })
-  // }, [_login])
-
-  useEffect(() => {
-    userService.me().then((u) => {
-      console.log(u)
-    })
-  }, [userService])
-
-  return (
-    <Router history={history}>
-      <SplitPane split="vertical" defaultSize={200} primary="first">
-        <div>
-          <h1>Spring CMS</h1>
-        </div>
-        <div>
-          <h2>{currentUser?.email}</h2>
-          <p>Hello Backend</p>
-        </div>
-      </SplitPane>
-    </Router>
-  )
-}
+export const App: React.FC = () => (
+  <Router history={history}>
+    <PageTitle />
+    <NotificationContainer />
+    <Suspense fallback={<Loading />}>
+      <Switch>
+        <PrivateRoute exact path={routes.root}>
+          <DashboardPage />
+        </PrivateRoute>
+        <PublicRoute exact path={routes.auth.login}>
+          <LoginPage />
+        </PublicRoute>
+        <Route path="*">
+          <NotFoundPage />
+        </Route>
+      </Switch>
+    </Suspense>
+  </Router>
+)
