@@ -21,7 +21,9 @@ const LoginPage: React.FC = () => {
     <main className="auth">
       <PageTitle title="Login" />
       <div className="auth__container">
-        <h1 className="auth__title">Log in to {appName}</h1>
+        <div className="auth__header">
+          <h1 className="auth__title">{appName}</h1>
+        </div>
         <LoginForm className="auth__form" loading={loading} onLogin={onLogin} />
       </div>
     </main>
