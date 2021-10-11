@@ -18,15 +18,17 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <main className="auth">
+    <>
       <PageTitle title="Login" />
-      <div className="auth__container">
-        <div className="auth__header">
-          <h1 className="auth__title">{appName}</h1>
+      <main className="page page-center">
+        <div className="container-tight py-4">
+          <div className="text-center mb-4">
+            <h1>{appName}</h1>
+          </div>
+          <LoginForm loading={loading} onLogin={onLogin} />
         </div>
-        <LoginForm className="auth__form" loading={loading} onLogin={onLogin} />
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
 

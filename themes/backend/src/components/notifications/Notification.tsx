@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { XIcon } from '@heroicons/react/outline'
 
 import * as t from '@/store/types'
+import { NotifyType } from '@/store/types'
 import { removeNotification } from '@/store/notifications/notifications.slice'
 
 export interface NotificationProps {
@@ -22,7 +22,10 @@ export const Notification: React.FC<NotificationProps> = ({ notification }) => {
   //   default:
   //     return 'notification__container_info'
   // }
-  const classType = useMemo(() => `notification__container_${notification.type}`, [notification.type])
+  const classType = useMemo(
+    () => (notification.type === NotifyType.Error ? 'alert-danger' : `alert-${notification.type}`),
+    [notification.type]
+  )
 
   const dispatch = useDispatch()
 
@@ -55,16 +58,20 @@ export const Notification: React.FC<NotificationProps> = ({ notification }) => {
   }, [notification.dismiss, onClose])
 
   return (
-    <div ref={rootElementRef} className="notification" style={parentStyle}>
-      <div onClick={onClose} className={`notification__container ${classType}`}>
-        {notification.title && (
-          <div className="notification__header">
-            <div className="notification__title">{notification.title}</div>
-            <XIcon className="notification__close" />
-          </div>
-        )}
-        <div className="notification__message">{notification.message}</div>
+    <div
+      ref={rootElementRef}
+      onClick={onClose}
+      className={`alert alert-important ${classType} alert-dismissible`}
+      role="alert"
+      style={parentStyle}
+    >
+      <div className="d-flex">
+        <div>
+          {notification.title && <h4 className="alert-title">{notification.title}</h4>}
+          <div>{notification.message}</div>
+        </div>
       </div>
+      <a className="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="close" />
     </div>
   )
 }
