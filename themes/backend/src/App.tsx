@@ -11,6 +11,7 @@ import { PrivateRoute } from '@/components/routing/PrivateRoute'
 
 const DashboardPage = lazy(() => import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/DashboardPage'))
 const LoginPage = lazy(() => import(/* webpackChunkName: "login" */ '@/views/login/LoginPage'))
+const CmsPage = lazy(() => import(/* webpackChunkName: "cms-page" */ '@/views/cms/CmsPage'))
 
 export const App: React.FC = () => (
   <Router history={history}>
@@ -24,6 +25,9 @@ export const App: React.FC = () => (
         <PublicRoute exact path={routes.auth.login}>
           <LoginPage />
         </PublicRoute>
+        <PrivateRoute exact path={routes.cms.pages}>
+          <CmsPage />
+        </PrivateRoute>
         <Route path="*">
           <Redirect to={routes.root} />
         </Route>
